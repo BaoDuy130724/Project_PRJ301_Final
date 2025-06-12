@@ -20,6 +20,7 @@
         %>
         <h1>Welcome <%= user.getFullName()%></h1>
         <a href="MainController?action=logout">Logout</a>
+        
         <%} else {%>
         <p>You do not have permission to access. Please login to access!!! <a href="MainController">Login</a></p>
         <%}%>
