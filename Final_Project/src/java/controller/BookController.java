@@ -12,14 +12,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import model.BookDAO;
+import model.BookDTO;
 
 /**
  *
  * @author Admin
  */
-@WebServlet(name = "MainController", urlPatterns = {"","/","/MainController"})
-public class MainController extends HttpServlet {
-
+@WebServlet(name = "BookController", urlPatterns = {"/BookController"})
+public class BookController extends HttpServlet {
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -29,27 +31,21 @@ public class MainController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    private static String WELCOME = "login.jsp";
-
+    private static final String WELCOME = "welcome.jsp";
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = WELCOME;
         String action = request.getParameter("action");
         try {
-            if (action != null) {
-                if (isUserAction(action)) {
-                    url = "UserController";
-                } else if (isBookAction(action)) {
-                    url = "BookController";
-                }
+            if(action.equals("search")){
+                url = handleBookSearching(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -91,24 +87,22 @@ public class MainController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private boolean isUserAction(String action) {
-        List<String> listUserAction = new ArrayList<>();
-        listUserAction.add("login");
-        listUserAction.add("register");
-        listUserAction.add("logout");
-        listUserAction.add("updateProfile");
-        if (listUserAction.contains(action)) {
-            return true;
+    private String handleBookSearching(HttpServletRequest request, HttpServletResponse response) {
+        String url = WELCOME;
+        try {
+            String searchTitle = request.getParameter("txtSearch");
+            BookDAO bdao = new BookDAO();
+            List<BookDTO> listBooks = new ArrayList<>();
+            listBooks = bdao.getBooksByTitle(searchTitle);
+            if(listBooks==null||listBooks.isEmpty()){
+                request.setAttribute("message", "No book found!!!!");
+            }else{
+                request.setAttribute("listBooks", listBooks);
+                request.setAttribute("searchTitle", searchTitle);
+            }
+        } catch (Exception e) {
         }
-        return false;
+        return url;
     }
 
-    private boolean isBookAction(String action) {
-        List<String> listBookAction = new ArrayList<>();
-        listBookAction.add("search");
-        if (listBookAction.contains(action)) {
-            return true;
-        }
-        return false;
-    }
 }

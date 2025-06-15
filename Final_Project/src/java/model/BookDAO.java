@@ -56,7 +56,7 @@ public class BookDAO {
             rs = pst.executeQuery();
             while (rs.next()){
                 int bookId = rs.getInt("BookID");
-                String title = title_input.trim();
+                String title = rs.getString("Title");
                 String author = rs.getString("Author");
                 String publisher = rs.getString("Publisher");
                 int yearPublished = rs.getInt("YearPublished");
