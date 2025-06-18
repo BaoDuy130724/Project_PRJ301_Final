@@ -34,6 +34,17 @@ public class BookDTO {
         this.available = available;
     }
 
+    public BookDTO(String title, String author, String publisher, int yearPublished, String ISBN, int categoryId, int quantity, int available) {
+        this.title = title;
+        this.author = author;
+        this.publisher = publisher;
+        this.yearPublished = yearPublished;
+        this.ISBN = ISBN;
+        this.categoryId = categoryId;
+        this.quantity = quantity;
+        this.available = available;
+    }
+
     public int getBookId() {
         return bookId;
     }

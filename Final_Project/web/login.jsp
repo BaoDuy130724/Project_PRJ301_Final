@@ -1,11 +1,5 @@
-<%-- 
-    Document   : login
-    Created on : Jun 11, 2025, 8:50:49 AM
-    Author     : Admin
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="utils.GeneralMethod"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -15,25 +9,28 @@
     <body>
         <div>
             <h1>Login Form</h1>
-            <%
-                if(GeneralMethod.isLoggedIn(request)){
-                    response.sendRedirect("welcom.jsp");
-                }else{
-                    String mess = (String) request.getAttribute("message");
-            %>
-            <form action="MainController" method="post">
-                <input type="hidden" name="action" value="login"/>
-                
-                <label for="name">User Name</label>
-                <input type="text" id="name" name="name" placeholder="Enter user name...">
-                
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter password...">
-                
-                <input type="submit" value="Login"/>
-            </form>
-            <span style="color: red"> <%= mess!=null?mess:"" %> </span>
-            <%}%>
+
+            <c:choose>
+                <c:when test="${sessionScope.user != null}">
+                    <c:redirect url="welcom.jsp" />
+                </c:when>
+                <c:otherwise>
+                    <form action="MainController" method="post">
+                        <input type="hidden" name="action" value="login"/>
+
+                        <label for="name">User Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter user name...">
+
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter password...">
+
+                        <input type="submit" value="Login"/>
+                    </form>
+                    <c:if test="${not empty message}">
+                        <span style="color: red">${message}</span>
+                    </c:if>
+                </c:otherwise>
+            </c:choose>
         </div>
     </body>
 </html>

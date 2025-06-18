@@ -20,7 +20,9 @@ public class BookDAO {
     ResultSet rs = null;
     private static final String GetBook = "SELECT * FROM Books ";
     private static final String UpdateBook = "UPDATE Books SET......";
-    private static final String CreateBook = "INSERT INTO Books VALUES (?,?,?,?,?,?,?)";
+    private static final String CreateBook = "INSERT INTO Books (Title, Author, Publisher, YearPublished, ISBN, CategoryId, Quantity, Available) "
+                                            +"VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
     public List<BookDTO> getBooksByISBN (String ISBN_input){
         List<BookDTO> books = new ArrayList<>();
         String sql = GetBook + "WHERE ISBN like ?";
@@ -82,9 +84,9 @@ public class BookDAO {
             pst.setString(3, book.getPublisher());
             pst.setInt(4, book.getYear());
             pst.setString(5, book.getISBN());
-            pst.setInt(6, book.getQuantity());
-            pst.setInt(7, book.getAvailable()); 
-            // còn category
+            pst.setInt(6, book.getCategoryId());
+            pst.setInt(7, book.getQuantity());
+            pst.setInt(8, book.getAvailable()); 
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,7 +95,6 @@ public class BookDAO {
     }
     private boolean checkISBN (String ISBN){
         List<BookDTO> checkedBook = getBooksByISBN(ISBN.trim());
-        if(checkedBook!=null || !checkedBook.isEmpty()) return true;
-        return false;
+        return checkedBook != null && !checkedBook.isEmpty(); 
     }
 }

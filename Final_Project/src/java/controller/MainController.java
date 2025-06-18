@@ -106,6 +106,9 @@ public class MainController extends HttpServlet {
     private boolean isBookAction(String action) {
         List<String> listBookAction = new ArrayList<>();
         listBookAction.add("search");
+        listBookAction.add("addBook");
+        listBookAction.add("submitCreateBook");
+        listBookAction.add("editBook");
         if (listBookAction.contains(action)) {
             return true;
         }
