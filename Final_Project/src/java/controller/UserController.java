@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import model.UserDAO;
 import model.UserDTO;
+import utils.PasswordUtils;
 
 /**
  *
@@ -99,6 +100,7 @@ public class UserController extends HttpServlet {
         try {
             String name = request.getParameter("name");
             String password = request.getParameter("password");
+            password = PasswordUtils.encryptSHA256(password);
             boolean logined = uDAO.checkLogin(name, password);
             if(logined){
                 url = WELCOME;
@@ -120,7 +122,7 @@ public class UserController extends HttpServlet {
             s.invalidate();
         }
         return LOGIN_PAGE;
-    }
+    } 
 
     private String handleRegister(HttpServletRequest request, HttpServletResponse response) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
