@@ -43,7 +43,7 @@
                                 <th>Publisher</th>
                                 <th>Year Published</th>
                                 <th>ISBN</th>
-                                <th>Category ID</th>
+                                <th>Category </th>
                                 <th>Quantity</th>
                                 <th>Available</th>
                                     <c:if test="${sessionScope.user.role eq 'admin'}">

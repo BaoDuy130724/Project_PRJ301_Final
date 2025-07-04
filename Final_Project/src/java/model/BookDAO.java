@@ -7,8 +7,10 @@ package model;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import utils.*;
 
 /**
  *
@@ -23,6 +25,30 @@ public class BookDAO {
     private static final String CreateBook = "INSERT INTO Books (Title, Author, Publisher, YearPublished, ISBN, CategoryId, Quantity, Available) "
                                             +"VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
+    public List<BookDTO> getAllBooks(){
+        List<BookDTO> books = new ArrayList<>();
+        String sql = GetBook;
+        try{
+            con =  DBUtils.getConnection();
+            Statement stmt = con.createStatement();
+            rs = stmt.executeQuery(sql);
+            while (rs.next()){
+                int bookId = rs.getInt("BookID");
+                String title = rs.getString("Title");
+                String author = rs.getString("Author");
+                String publisher = rs.getString("Publisher");
+                int yearPublished = rs.getInt("YearPublished");
+                String ISBN = rs.getString("ISBN");
+                int categoryID = rs.getInt("CategoryID");
+                int quantity = rs.getInt("Quantity");
+                int available = rs.getInt("Available");
+                books.add(new BookDTO(bookId, title, author, publisher, bookId, ISBN, categoryID, quantity, available));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return books;
+    }
     public List<BookDTO> getBooksByISBN (String ISBN_input){
         List<BookDTO> books = new ArrayList<>();
         String sql = GetBook + "WHERE ISBN like ?";
@@ -37,7 +63,7 @@ public class BookDAO {
                 String author = rs.getString("Author");
                 String publisher = rs.getString("Publisher");
                 int yearPublished = rs.getInt("YearPublished");
-                String ISBN = ISBN_input;
+                String ISBN = rs.getString("ISBN");
                 int categoryID = rs.getInt("CategoryID");
                 int quantity = rs.getInt("Quantity");
                 int available = rs.getInt("Available");

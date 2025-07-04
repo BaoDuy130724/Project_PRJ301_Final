@@ -6,6 +6,12 @@ package utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
+import model.BookDAO;
+import model.BookDTO;
+import model.CategoryDAO;
+import model.CategoryDTO;
 import model.UserDTO;
 
 /**
@@ -34,5 +40,21 @@ public class GeneralMethod {
     }
     public static boolean isMember (HttpServletRequest request){
         return hasRole(request, "member");
+    }
+    static BookDAO bdao = new BookDAO();
+    static CategoryDAO cdao = new CategoryDAO();
+    public static void pushListBook(HttpServletRequest request){
+        List<BookDTO> books = new ArrayList<>();
+        books = bdao.getAllBooks();
+        request.setAttribute("listBooks", books);
+    }
+    public static void pushListCategory(HttpServletRequest request){
+        List<CategoryDTO> categories = new ArrayList<>();
+        categories = cdao.getAllCategories();
+        request.setAttribute("listCategories", categories);
+    }
+    public static void prepareDashboard(HttpServletRequest request){
+        pushListBook(request);
+        pushListCategory(request);
     }
 }

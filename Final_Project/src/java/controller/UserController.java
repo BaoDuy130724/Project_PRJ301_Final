@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import model.UserDAO;
 import model.UserDTO;
-import utils.PasswordUtils;
+import utils.*;
 
 /**
  *
@@ -105,6 +105,7 @@ public class UserController extends HttpServlet {
             if(logined){
                 url = WELCOME;
                 UserDTO user = uDAO.getUserByName(name);
+                GeneralMethod.prepareDashboard(request);
                 session.setAttribute("user", user);
             } else {
                 url = LOGIN_PAGE;
