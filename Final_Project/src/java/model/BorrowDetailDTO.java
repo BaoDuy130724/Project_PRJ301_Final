@@ -11,14 +11,16 @@ package model;
 public class BorrowDetailDTO {
     private int borrowId;
     private int bookId;
+    private String bookTitle;
     private int quantity;
 
     public BorrowDetailDTO() {
     }
 
-    public BorrowDetailDTO(int borrowId, int bookId, int quantity) {
+    public BorrowDetailDTO(int borrowId, int bookId, String bookTitle, int quantity) {
         this.borrowId = borrowId;
         this.bookId = bookId;
+        this.bookTitle = bookTitle;
         this.quantity = quantity;
     }
 
@@ -28,6 +30,22 @@ public class BorrowDetailDTO {
 
     public int getBookId() {
         return bookId;
+    }
+
+    public void setBorrowId(int borrowId) {
+        this.borrowId = borrowId;
+    }
+
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
+    }
+
+    public void setBookTitle(String bookTitle) {
+        this.bookTitle = bookTitle;
+    }
+
+    public String getBookTitle() {
+        return bookTitle;
     }
 
     public int getQuantity() {

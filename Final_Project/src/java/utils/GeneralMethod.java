@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import model.BookDAO;
 import model.BookDTO;
+import model.BorrowDAO;
+import model.BorrowDTO;
 import model.CategoryDAO;
 import model.CategoryDTO;
 import model.UserDTO;
@@ -41,11 +43,19 @@ public class GeneralMethod {
     public static boolean isMember (HttpServletRequest request){
         return hasRole(request, "member");
     }
+    public static void getAccessDenied (HttpServletRequest request, String message){
+        request.setAttribute("accessDenied", message);
+    }
     static BookDAO bdao = new BookDAO();
     static CategoryDAO cdao = new CategoryDAO();
-    public static void pushListBook(HttpServletRequest request){
+    static BorrowDAO brdao = new BorrowDAO();
+    public static void pushListBook(HttpServletRequest request, String role){
         List<BookDTO> books = new ArrayList<>();
-        books = bdao.getAllBooks();
+        if(role.equalsIgnoreCase("admin")){
+            books = bdao.getAllBooks();
+        }else if(role.equalsIgnoreCase("member")){
+            books = bdao.getActiveBooks();
+        }
         request.setAttribute("listBooks", books);
     }
     public static void pushListCategory(HttpServletRequest request){
@@ -53,8 +63,13 @@ public class GeneralMethod {
         categories = cdao.getAllCategories();
         request.setAttribute("listCategories", categories);
     }
-    public static void prepareDashboard(HttpServletRequest request){
-        pushListBook(request);
+    public static void prepareDashboard(HttpServletRequest request, String role){
+        pushListBook(request,role);
         pushListCategory(request);
+    }
+    public static void pushListBorrow(HttpServletRequest request){
+        List<BorrowDTO> borrows = new ArrayList<>();
+        borrows = brdao.getAllBorrows();
+        request.setAttribute("listBorrows", borrows);
     }
 }

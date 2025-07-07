@@ -18,11 +18,13 @@ public class BookDTO {
     private int categoryId;
     private int quantity;
     private int available;
+    private boolean isdeleted;
     public BookDTO(){
         
     }
 
-    public BookDTO(int bookId, String title, String author, String publisher, int year, String ISBN, int categoryId, int quantity, int available) {
+    public BookDTO(int bookId, String title, String author, String publisher, 
+            int year, String ISBN, int categoryId, int quantity, int available, boolean isdeleted) {
         this.bookId = bookId;
         this.title = title;
         this.author = author;
@@ -32,9 +34,11 @@ public class BookDTO {
         this.categoryId = categoryId;
         this.quantity = quantity;
         this.available = available;
+        this.isdeleted = isdeleted;
     }
 
-    public BookDTO(String title, String author, String publisher, int yearPublished, String ISBN, int categoryId, int quantity, int available) {
+    public BookDTO(String title, String author, String publisher, 
+            int yearPublished, String ISBN, int categoryId, int quantity, int available, boolean isdeleted) {
         this.title = title;
         this.author = author;
         this.publisher = publisher;
@@ -43,6 +47,7 @@ public class BookDTO {
         this.categoryId = categoryId;
         this.quantity = quantity;
         this.available = available;
+        this.isdeleted = isdeleted;
     }
 
     public int getBookId() {
@@ -61,7 +66,7 @@ public class BookDTO {
         return publisher;
     }
 
-    public int getYear() {
+    public int getYearPublished() {
         return yearPublished;
     }
 
@@ -81,6 +86,10 @@ public class BookDTO {
         return available;
     }
 
+    public boolean isIsdeleted() {
+        return isdeleted;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -93,8 +102,8 @@ public class BookDTO {
         this.publisher = publisher;
     }
 
-    public void setYear(int year) {
-        this.yearPublished = year;
+    public void setYearPublished(int yearPublished) {
+        this.yearPublished = yearPublished;
     }
 
     public void setISBN(String ISBN) {
@@ -109,8 +118,15 @@ public class BookDTO {
         this.quantity = quantity;
     }
 
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
+    }
+
     public void setAvailable(int available) {
         this.available = available;
     }
-    
+
+    public void setIsdeleted(boolean isdeleted) {
+        this.isdeleted = isdeleted;
+    }
 }

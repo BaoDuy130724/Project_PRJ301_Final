@@ -42,6 +42,8 @@ public class MainController extends HttpServlet {
                     url = "UserController";
                 } else if (isBookAction(action)) {
                     url = "BookController";
+                } else if (isBorrowAction(action)) {
+                    url = "BorrowController";
                 }
             }
         } catch (Exception e) {
@@ -96,6 +98,7 @@ public class MainController extends HttpServlet {
         listUserAction.add("login");
         listUserAction.add("register");
         listUserAction.add("logout");
+        listUserAction.add("viewProfile");
         listUserAction.add("updateProfile");
         if (listUserAction.contains(action)) {
             return true;
@@ -107,9 +110,20 @@ public class MainController extends HttpServlet {
         List<String> listBookAction = new ArrayList<>();
         listBookAction.add("search");
         listBookAction.add("addBook");
-        listBookAction.add("submitCreateBook");
+        listBookAction.add("bookSubmitting");
         listBookAction.add("editBook");
+        listBookAction.add("deleteBook");
         if (listBookAction.contains(action)) {
+            return true;
+        }
+        return false;
+    }
+    private boolean isBorrowAction(String action) {
+        List<String> listBorrowAction = new ArrayList<>();
+        listBorrowAction.add("viewAllBorrows");
+        listBorrowAction.add("viewBorrowDetailAjax");
+        listBorrowAction.add("searchMyBorrows");
+        if (listBorrowAction.contains(action)) {
             return true;
         }
         return false;

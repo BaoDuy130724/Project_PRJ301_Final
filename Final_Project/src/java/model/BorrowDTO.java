@@ -13,6 +13,7 @@ import java.sql.Date;
 public class BorrowDTO {
     private int borrowId;
     private int userId;
+    private String fullName;
     private Date borrowDate;
     private Date returnDate;
     private String status;
@@ -20,9 +21,10 @@ public class BorrowDTO {
         
     }
 
-    public BorrowDTO(int borrowId, int userId, Date borrowDate, Date returnDate, String status) {
+    public BorrowDTO(int borrowId, int userId, String fullName, Date borrowDate, Date returnDate, String status) {
         this.borrowId = borrowId;
         this.userId = userId;
+        this.fullName = fullName;
         this.borrowDate = borrowDate;
         this.returnDate = returnDate;
         this.status = status;
@@ -30,6 +32,18 @@ public class BorrowDTO {
 
     public int getBorrowId() {
         return borrowId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getFullName() {
+        return fullName;
     }
 
     public int getUserId() {

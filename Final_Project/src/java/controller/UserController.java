@@ -11,6 +11,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import model.BookDAO;
+import model.BookDTO;
+import model.BorrowDAO;
+import model.BorrowDTO;
 import model.UserDAO;
 import model.UserDTO;
 import utils.*;
@@ -21,9 +27,13 @@ import utils.*;
  */
 @WebServlet(name = "UserController", urlPatterns = {"/UserController"})
 public class UserController extends HttpServlet {
+
     private static String WELCOME = "welcome.jsp";
     private static String LOGIN_PAGE = "login.jsp";
     UserDAO uDAO = new UserDAO();
+    BookDAO bdao = new BookDAO();
+    BorrowDAO brdao = new BorrowDAO();
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -39,20 +49,23 @@ public class UserController extends HttpServlet {
         String url = LOGIN_PAGE;
         try {
             String action = request.getParameter("action");
-            if(action.equals("login")){
+            if (action.equals("login")) {
                 url = handleLogin(request, response);
-            } else if (action.equals("logout")){
+            } else if (action.equals("logout")) {
                 url = handleLogout(request, response);
-            }else if (action.equals("register")){
+            } else if (action.equals("register")) {
                 url = handleRegister(request, response);
-            }else if (action.equals("updateProfile")){
-                url = handleLogout(request, response);
+            } else if (action.equals("viewProfile")) {
+                url = handleViewProfile(request, response);
+            } else if (action.equals("updateProfile")) {
+                url = handleUserUpdating(request, response);
             }
         } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
-        
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -97,15 +110,16 @@ public class UserController extends HttpServlet {
     private String handleLogin(HttpServletRequest request, HttpServletResponse response) {
         String url = LOGIN_PAGE;
         HttpSession session = request.getSession();
+        List<BookDTO> books = new ArrayList<>();
         try {
             String name = request.getParameter("name");
             String password = request.getParameter("password");
             password = PasswordUtils.encryptSHA256(password);
             boolean logined = uDAO.checkLogin(name, password);
-            if(logined){
+            if (logined) {
                 url = WELCOME;
                 UserDTO user = uDAO.getUserByName(name);
-                GeneralMethod.prepareDashboard(request);
+                GeneralMethod.prepareDashboard(request, user.getRole());
                 session.setAttribute("user", user);
             } else {
                 url = LOGIN_PAGE;
@@ -119,14 +133,63 @@ public class UserController extends HttpServlet {
 
     private String handleLogout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession s = request.getSession(false);
-        if(s!=null){
+        if (s != null) {
             s.invalidate();
         }
         return LOGIN_PAGE;
-    } 
+    }
 
     private String handleRegister(HttpServletRequest request, HttpServletResponse response) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    private String handleViewProfile(HttpServletRequest request, HttpServletResponse response) {
+        String tab = request.getParameter("tab");
+        if (tab == null || tab.isEmpty()) {
+            tab = "profile";
+        }
+
+        UserDTO user = GeneralMethod.getCurrentUser(request);
+        List<BorrowDTO> list = brdao.getBorrowsByUser(user.getUserID());
+        request.setAttribute("myBorrows", list);
+        
+        request.setAttribute("activeTab", tab);
+        request.setAttribute("user", user);
+        return "profile.jsp";
+    }
+
+    private String handleUserUpdating(HttpServletRequest request, HttpServletResponse response) {
+        String url = "profile.jsp";
+        try {
+            UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+            if (currentUser == null) {
+                request.setAttribute("message", "You must be logged in to update profile.");
+                return "login.jsp";
+            }
+
+            String fullName = request.getParameter("fullName");
+            String email = request.getParameter("email");
+
+            if (fullName == null || fullName.trim().isEmpty() || email == null || email.trim().isEmpty()) {
+                request.setAttribute("message", "Full name and email must not be empty.");
+                return url;
+            }
+
+            currentUser.setFullName(fullName.trim());
+            currentUser.setEmail(email.trim());
+
+            boolean success = uDAO.updateProfile(currentUser);
+            if (success) {
+                request.setAttribute("message", "Profile updated successfully.");
+                request.getSession().setAttribute("user", currentUser);
+            } else {
+                request.setAttribute("message", "Failed to update profile.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("message", "An error occurred while updating profile.");
+        }
+        return url;
     }
 
 }

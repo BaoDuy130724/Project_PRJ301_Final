@@ -96,7 +96,22 @@ public class UserDAO {
             pst = con.prepareStatement(sql);
             pst.setString(1, newPassword);
             pst.setInt(2, UserID);
-            boolean rowinserted = pst.executeUpdate()>0;
+            boolean rowinserted = pst.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateProfile(UserDTO user) {
+        String sql = "UPDATE Users SET FullName = ?, Email = ? WHERE Username = ?";
+        try {
+            con = utils.DBUtils.getConnection();
+            pst = con.prepareStatement(sql);
+            pst.setString(1, user.getFullName());
+            pst.setString(2, user.getEmail());
+            pst.setString(3, user.getUserName());
+            return pst.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -17,13 +17,15 @@
             <c:when test="${sessionScope.user != null && sessionScope.user.role eq 'admin'}">
                 <h1>${isAdd ? "ADD BOOK" : "EDIT BOOK"}</h1>
                 <form action="MainController" method="post">
-                    <input type="hidden" name="action" value="${isAdd?"submitCreateBook":"editBook"}"/>
-
+                    <input type="hidden" name="action" value="bookSubmitting"/>
+                    <input type="hidden" name="bookId" value="${book != null ? book.bookId : 0}"/>
+                    <input type="hidden" name="isAdd" value="${isAdd}"/>
+                    
                     <label for="title">Title*</label>
                     <input type="text" name="title" id="title" value="${book.title}" required=""/> <br/>
 
                     <label for="author">Author</label>
-                    <input type="text" name="author" id="auhtor" value="${book.author}" required=""/><br/>
+                    <input type="text" name="author" id="author" value="${book.author}" required=""/><br/>
 
                     <label for="publisher">Publisher</label>
                     <input type="text" name="publisher" id="publisher" value="${book.publisher}" required=""/><br/>
@@ -35,9 +37,13 @@
                     <input type="text" name="ISBN" id="ISBN" value="${book.ISBN}" required=""/><br/>
 
                     <label for="category">Category</label>
-                    <select name="categoryId" id="category">
+                    <select name="categoryId" id="category" required>
+                        <option value="" disabled ${book == null || book.categoryId == 0 ? "selected" : ""}>--- Select Category ---</option>
                         <c:forEach var="category" items="${listCategories}">
-                            <option value="${category.categoryId}">${category.name}</option>
+                            <option value="${category.categoryId}" 
+                                    ${book != null && book.categoryId == category.categoryId ? "selected" : ""}>
+                                ${category.name}
+                            </option>
                         </c:forEach>
                     </select><br/>
 

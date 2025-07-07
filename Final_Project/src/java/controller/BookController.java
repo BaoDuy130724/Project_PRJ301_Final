@@ -36,12 +36,6 @@ public class BookController extends HttpServlet {
      */
     private static final String WELCOME = "welcome.jsp";
 
-    private static final void pushCategoryDAO(HttpServletRequest request) {
-        CategoryDAO cdao = new CategoryDAO();
-        List<CategoryDTO> listCategories = new ArrayList<>();
-        listCategories = cdao.getAllCategories();
-        request.setAttribute("listCategories", listCategories);
-    }
     BookDAO bdao = new BookDAO();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -54,8 +48,12 @@ public class BookController extends HttpServlet {
                 url = handleBookSearching(request, response);
             } else if (action.equals("addBook")) {
                 url = handleBookAdding(request, response);
-            } else if (action.equals("submitCreateBook")) {
+            } else if (action.equals("bookSubmitting")) {
                 url = handleBookSubmitting(request, response);
+            } else if (action.equals("deleteBook")) {
+                url = handleBookDeleting(request, response);
+            } else if (action.equals("editBook")) {
+                url = handleBookEditing(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,7 +110,7 @@ public class BookController extends HttpServlet {
             if (listBooks == null || listBooks.isEmpty()) {
                 request.setAttribute("message", "No book found!!!!");
             } else {
-                pushCategoryDAO(request);
+                GeneralMethod.pushListCategory(request);
                 request.setAttribute("listBooks", listBooks);
                 request.setAttribute("searchTitle", searchTitle);
 
@@ -126,7 +124,7 @@ public class BookController extends HttpServlet {
         boolean isAdd = Boolean.parseBoolean(request.getParameter("isAdd"));
         if (GeneralMethod.isAdmin(request)) {
             request.setAttribute("isAdd", isAdd);
-            pushCategoryDAO(request);
+            GeneralMethod.pushListCategory(request);
             return "productForm.jsp";
         }
         return WELCOME;
@@ -134,14 +132,9 @@ public class BookController extends HttpServlet {
 
     private String handleBookSubmitting(HttpServletRequest request, HttpServletResponse response) {
         boolean isAdd = Boolean.parseBoolean(request.getParameter("isAdd"));
-        String url = "productForm.jsp";
+        String url = WELCOME;
         try {
             String errorMessage = validateBookForm(request);
-            if (errorMessage != null) {
-                request.setAttribute("message", errorMessage);
-                pushCategoryDAO(request);
-                return url;
-            }
             String title = request.getParameter("title");
             String author = request.getParameter("author");
             String publisher = request.getParameter("publisher");
@@ -150,18 +143,32 @@ public class BookController extends HttpServlet {
             int quantity = Integer.parseInt(request.getParameter("quantity"));
             int available = Integer.parseInt(request.getParameter("available"));
             int categoryId = Integer.parseInt(request.getParameter("categoryId"));
-            BookDTO book = new BookDTO(title, author, publisher, yearPublished, ISBN, categoryId, quantity, available);
-            boolean success = bdao.createBook(book);
-            if (success) {
-                request.setAttribute("message", "Book added successfully.");
+            BookDTO book = new BookDTO(title, author, publisher, yearPublished, ISBN, categoryId, quantity, available, false);
+            if (errorMessage != null) {
+                request.setAttribute("message", errorMessage);
+                request.setAttribute("book", book);
+                request.setAttribute("isAdd", isAdd);
+                GeneralMethod.pushListCategory(request);
+                return url;
+            }
+            boolean success;
+            if (isAdd) {
+                success = bdao.createBook(book);
+                request.setAttribute("message", success ? "Book added successfully." : "Failed to add book.");
             } else {
-                request.setAttribute("message", "Failed to add book.");
+                int bookId = Integer.parseInt(request.getParameter("bookId"));
+                book.setBookId(bookId);
+                success = bdao.updateBook(book);
+                request.setAttribute("message", success ? "Book updated successfully." : "Failed to update book.");
+            }
+            if (!success) {
+                request.setAttribute("book", book);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         request.setAttribute("isAdd", isAdd);
-        pushCategoryDAO(request);
+        GeneralMethod.prepareDashboard(request, GeneralMethod.getCurrentUser(request).getRole());
         return url;
     }
 
@@ -195,5 +202,37 @@ public class BookController extends HttpServlet {
             return "Year, quantity, available, and category ID must be valid numbers.";
         }
         return null;
+    }
+
+    private String handleBookDeleting(HttpServletRequest request, HttpServletResponse response) {
+        if (!GeneralMethod.isAdmin(request)) {
+            GeneralMethod.getAccessDenied(request, "You do not have permission to access this page.");
+        }
+        String bookId = request.getParameter("bookId");
+        try {
+            int bookId_value = Integer.parseInt(bookId);
+            boolean deleted = bdao.deleteBook(bookId_value);
+            if (deleted) {
+                request.setAttribute("messDelete", "Successfully Deleted");
+            } else {
+                request.setAttribute("messDelete", "Unsuccessfully Deleted");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        GeneralMethod.prepareDashboard(request, GeneralMethod.getCurrentUser(request).getRole());
+        return WELCOME;
+    }
+
+    private String handleBookEditing(HttpServletRequest request, HttpServletResponse response) {
+        String bookId = request.getParameter("bookId");
+        try {
+            int bookId_value = Integer.parseInt(bookId);
+            BookDTO book = bdao.getBookById(bookId_value);
+            request.setAttribute("book", book);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return handleBookAdding(request, response);
     }
 }
