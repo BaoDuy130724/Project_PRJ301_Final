@@ -1,206 +1,198 @@
-<%-- 
+<%--
     Document   : profile
     Created on : Jul 7, 2025, 7:09:33 PM
     Author     : Admin
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>PROFILE Page</title>
-        <style>
-            .tab-button {
-                padding: 10px 20px;
-                cursor: pointer;
-                margin-right: 10px;
-                background-color: lightgray;
-                border: none;
-            }
-            .active-tab {
-                background-color: #007bff;
-                color: white;
-            }
-            .tab-content {
-                display: none;
-                margin-top: 20px;
-            }
-            #detailOverlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                z-index: 999;
-            }
-            #detailPopup {
-                display: none;
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.3);
-                z-index: 1000;
-                min-width: 300px;
-                max-height: 80vh;
-                overflow: auto;
-            }
-        </style>
-    </head>
-    <body>
-        <c:choose>
-            <c:when test="${not empty sessionScope.user}">
 
-                <!-- Tab Buttons -->
-                <div>
-                    <button class="tab-button active-tab" onclick="showTab('profileTab', this)">Profile</button>
-                    <button class="tab-button" onclick="showTab('borrowTab', this)">My Borrows</button>
-                </div>
+<%-- Include the header --%>
+<%@include file="partials/header.jsp" %>
 
-                <!-- Profile Tab -->
-                <div id="profileTab" class="tab-content" style="display:block;">
-                    <h2>Profile Information</h2>
+<c:choose>
+    <c:when test="${not empty sessionScope.user}">
+        <div class="container mt-5">
+            <ul class="nav nav-pills mb-3" id="profileTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profileContent" type="button" role="tab" aria-controls="profileContent" aria-selected="true">Profile</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="borrows-tab" data-bs-toggle="tab" data-bs-target="#borrowContent" type="button" role="tab" aria-controls="borrowContent" aria-selected="false">My Borrows</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="profileTabContent">
+                <div class="tab-pane fade show active" id="profileContent" role="tabpanel" aria-labelledby="profile-tab">
+                    <h2 class="mb-4">Profile Information</h2>
                     <form action="MainController" method="post">
                         <input type="hidden" name="action" value="updateProfile" />
-                        <label>Username: </label>
-                        <input type="text" name="username" value="${sessionScope.user.userName}" readonly /><br/>
-                        <label>Full Name: </label>
-                        <input type="text" name="fullName" value="${sessionScope.user.fullName}" required/><br/>
-                        <label>Email: </label>
-                        <input type="email" name="email" value="${sessionScope.user.email}" required/><br/>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username:</label>
+                            <input type="text" class="form-control" id="username" name="username" value="${sessionScope.user.userName}" readonly />
+                        </div>
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name:</label>
+                            <input type="text" class="form-control" id="fullName" name="fullName" value="${sessionScope.user.fullName}" required/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="email" name="email" value="${sessionScope.user.email}" required/>
+                        </div>
                         <c:if test="${sessionScope.user.role eq 'admin'}">
-                            <label>Role: </label>
-                            <input type="text" value="${sessionScope.user.role}" readonly/><br/>
+                            <div class="mb-3">
+                                <label class="form-label">Role:</label>
+                                <input type="text" class="form-control" value="${sessionScope.user.role}" readonly/>
+                            </div>
                         </c:if>
-                        <input type="submit" value="Update Profile" />
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
                     </form>
 
                     <c:if test="${not empty message}">
-                        <p style="color:green;">${message}</p>
+                        <div class="alert alert-success mt-3" role="alert">
+                            ${message}
+                        </div>
                     </c:if>
                 </div>
 
-                <!-- Borrow Tab -->
-                <div id="borrowTab" class="tab-content">
-                    <h2>My Borrow Orders</h2>
+                <div class="tab-pane fade" id="borrowContent" role="tabpanel" aria-labelledby="borrows-tab">
+                    <h2 class="mb-4">My Borrow Orders</h2>
 
-                    <form action="BorrowController" method="get">
+                    <form action="BorrowController" method="get" class="row g-3 align-items-end mb-4">
                         <input type="hidden" name="action" value="searchMyBorrows"/>
-                        From: <input type="date" name="fromDate" value="${fromDate}" />
-                        To:   <input type="date" name="toDate" value="${toDate}" />
-                        <input type="submit" value="Search" />
+                        <div class="col-md-auto">
+                            <label for="fromDate" class="form-label">From:</label>
+                            <input type="date" class="form-control" id="fromDate" name="fromDate" value="${fromDate}" />
+                        </div>
+                        <div class="col-md-auto">
+                            <label for="toDate" class="form-label">To:</label>
+                            <input type="date" class="form-control" id="toDate" name="toDate" value="${toDate}" />
+                        </div>
+                        <div class="col-md-auto">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </div>
                     </form>
 
                     <c:if test="${not empty myBorrows}">
-                        <table border="1" cellpadding="5" style="margin-top:10px;">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Borrow Date</th>
-                                    <th>Return Date</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach var="b" items="${myBorrows}">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-hover">
+                                <thead class="table-dark">
                                     <tr>
-                                        <td>${b.borrowId}</td>
-                                        <td>${b.borrowDate}</td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${empty b.returnDate}">
-                                                    <span style="color:red;">Not Returned</span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    ${b.returnDate}
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>${b.status}</td>
-                                        <td>
-                                            <button onclick="viewDetail(${b.borrowId})">View Detail</button>
-                                        </td>
+                                        <th>No</th>
+                                        <th>Borrow Date</th>
+                                        <th>Return Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
                                     </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="b" items="${myBorrows}" varStatus="status">
+                                        <tr>
+                                            <td>${status.count}</td>
+                                            <td>${b.borrowDate}</td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${empty b.returnDate}">
+                                                        <span class="text-danger">Not Returned</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        ${b.returnDate}
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>${b.status}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-info btn-sm" onclick="viewDetail(${b.borrowId})">View Detail</button>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
                     </c:if>
                     <c:if test="${not empty error}">
-                        <p style="color:red;">${error}</p>
+                        <div class="alert alert-danger mt-3" role="alert">
+                            ${error}
+                        </div>
                     </c:if>
 
                     <c:if test="${empty myBorrows}">
-                        <p>No borrow records found.</p>
+                        <p class="mt-3">No borrow records found.</p>
                     </c:if>
                 </div>
-                <div id="detailOverlay" onclick="closeDetail()"></div>
-                <div id="detailPopup">
-                    <button onclick="closeDetail()">X</button>
-                    <h3>Borrow Details</h3>
-                    <div id="detailContent">Loading...</div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="borrowDetailModal" tabindex="-1" aria-labelledby="borrowDetailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="borrowDetailModalLabel">Borrow Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="detailContent">
+                        Loading...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
+            </div>
+        </div>
 
-                <script>
-                    function showTab(tabId, button) {
-                        document.getElementById("profileTab").style.display = "none";
-                        document.getElementById("borrowTab").style.display = "none";
-                        document.getElementById(tabId).style.display = "block";
+        <script>
+            // Function to activate a specific Bootstrap tab programmatically on page load
+            window.onload = function () {
+                const activeTabName = "${activeTab}"; // Get the active tab name from server-side variable
 
-                        // Update button style
-                        let buttons = document.getElementsByClassName("tab-button");
-                        for (let btn of buttons) {
-                            btn.classList.remove("active-tab");
-                        }
-                        if (button) {
-                            button.classList.add("active-tab");
-                        }
+                // Find the corresponding Bootstrap tab button and activate it
+                if (activeTabName === "borrows") {
+                    const borrowsTab = document.getElementById('borrows-tab');
+                    if (borrowsTab) {
+                        const bsTab = new bootstrap.Tab(borrowsTab);
+                        bsTab.show();
                     }
-
-                    window.onload = function () {
-                        const tab = "${activeTab}";
-                        const btns = document.getElementsByClassName("tab-button");
-                        if (tab === "borrows") {
-                            showTab("borrowTab", btns[1]);
-                        } else {
-                            showTab("profileTab", btns[0]);
-                        }
-                    };
-                    function viewDetail(borrowId) {
-                        document.getElementById("detailOverlay").style.display = "block";
-                        document.getElementById("detailPopup").style.display = "block";
-                        document.getElementById("detailContent").innerHTML = "Loading...";
-
-                        fetch(`BorrowController?action=viewBorrowDetailAjax&borrowId=` + borrowId)
-                                .then(response => {
-                                    if (!response.ok)
-                                        throw new Error("Failed to load borrow details.");
-                                    return response.text();
-                                })
-                                .then(html => {
-                                    document.getElementById("detailContent").innerHTML = html;
-                                })
-                                .catch(err => {
-                                    document.getElementById("detailContent").innerHTML = `<p style="color:red;">${err.message}</p>`;
-                                });
+                } else {
+                    const profileTab = document.getElementById('profile-tab');
+                    if (profileTab) {
+                        const bsTab = new bootstrap.Tab(profileTab);
+                        bsTab.show();
                     }
+                }
+            };
 
-                    function closeDetail() {
-                        document.getElementById("detailOverlay").style.display = "none";
-                        document.getElementById("detailPopup").style.display = "none";
-                    }
-                </script>
-            </c:when>
-            <c:otherwise>
-                <p>You must <a href="MainController">login</a> to view your profile.</p>
-            </c:otherwise>
-        </c:choose>
-    </body>
-</html>
+            // Function to display borrow details in a Bootstrap modal
+            function viewDetail(borrowId) {
+                const detailContent = document.getElementById("detailContent");
+                detailContent.innerHTML = "<p>Loading borrow details...</p>"; // Initial loading message
+
+                // Get the Bootstrap modal instance
+                const borrowDetailModal = new bootstrap.Modal(document.getElementById('borrowDetailModal'));
+                borrowDetailModal.show(); // Show the modal
+
+                // Fetch borrow details via AJAX
+                fetch(`BorrowController?action=viewBorrowDetailAjax&borrowId=` + borrowId)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Failed to load borrow details. Status: " + response.status);
+                            }
+                            return response.text();
+                        })
+                        .then(html => {
+                            detailContent.innerHTML = html; // Populate modal body with fetched HTML
+                        })
+                        .catch(err => {
+                            detailContent.innerHTML = `<p class="text-danger">Error: ${err.message}</p>`;
+                        });
+            }
+        </script>
+    </c:when>
+    <c:otherwise>
+        <div class="container text-center mt-5">
+            <p class="alert alert-warning">You must <a href="MainController">login</a> to view your profile.</p>
+        </div>
+    </c:otherwise>
+</c:choose>
+
+<%-- Include the footer --%>
+<%@include file="partials/footer.jsp" %>

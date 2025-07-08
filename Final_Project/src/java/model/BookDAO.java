@@ -46,7 +46,7 @@ public class BookDAO {
                 int quantity = rs.getInt("Quantity");
                 int available = rs.getInt("Available");
                 boolean isdeleted = rs.getBoolean("IsDeleted");
-                books.add(new BookDTO(bookId, title, author, publisher, bookId, ISBN, categoryID, quantity, available, isdeleted));
+                books.add(new BookDTO(bookId, title, author, publisher, yearPublished, ISBN, categoryID, quantity, available, isdeleted));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,7 +72,7 @@ public class BookDAO {
                 int quantity = rs.getInt("Quantity");
                 int available = rs.getInt("Available");
                 boolean isdeleted = rs.getBoolean("IsDeleted");
-                books.add(new BookDTO(bookId, title, author, publisher, bookId, ISBN, categoryID, quantity, available, isdeleted));
+                books.add(new BookDTO(bookId, title, author, publisher, yearPublished, ISBN, categoryID, quantity, available, isdeleted));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,7 +99,7 @@ public class BookDAO {
                 int quantity = rs.getInt("Quantity");
                 int available = rs.getInt("Available");
                 boolean isdeleted = rs.getBoolean("IsDeleted");
-                books.add(new BookDTO(bookId, title, author, publisher, bookId, ISBN, categoryID, quantity, available, isdeleted));
+                books.add(new BookDTO(bookId, title, author, publisher, yearPublished, ISBN, categoryID, quantity, available, isdeleted));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -126,7 +126,7 @@ public class BookDAO {
                 int quantity = rs.getInt("Quantity");
                 int available = rs.getInt("Available");
                 boolean isdeleted = rs.getBoolean("IsDeleted");
-                books.add(new BookDTO(bookId, title, author, publisher, bookId, ISBN, categoryID, quantity, available, isdeleted));
+                books.add(new BookDTO(bookId, title, author, publisher, yearPublished, ISBN, categoryID, quantity, available, isdeleted));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,7 +153,7 @@ public class BookDAO {
                 int quantity = rs.getInt("Quantity");
                 int available = rs.getInt("Available");
                 boolean isdeleted = rs.getBoolean("IsDeleted");
-                book = new BookDTO(bookId, title, author, publisher, id, ISBN, categoryID, quantity, available, isdeleted);
+                book = new BookDTO(bookId, title, author, publisher, yearPublished, ISBN, categoryID, quantity, available, isdeleted);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -217,6 +217,19 @@ public class BookDAO {
             pst.setInt(8, book.getAvailable());
             pst.setInt(9, book.getBookId());
             return pst.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean updateBookAvailable(int bookId, int delta){
+        String sql = "UPDATE Books SET Available = Available + ? WHERE BookID = ?";
+        try {
+            con = utils.DBUtils.getConnection();
+            pst = con.prepareStatement(sql);
+            pst.setInt(1, delta);
+            pst.setInt(2, bookId);
+            return pst.executeUpdate()>0;
         } catch (Exception e) {
             e.printStackTrace();
         }

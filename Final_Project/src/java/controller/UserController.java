@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import model.BookDAO;
 import model.BookDTO;
 import model.BorrowDAO;
@@ -53,6 +54,8 @@ public class UserController extends HttpServlet {
                 url = handleLogin(request, response);
             } else if (action.equals("logout")) {
                 url = handleLogout(request, response);
+            } else if (action.equals("home")) {
+                url = handleHome(request, response);
             } else if (action.equals("register")) {
                 url = handleRegister(request, response);
             } else if (action.equals("viewProfile")) {
@@ -140,7 +143,47 @@ public class UserController extends HttpServlet {
     }
 
     private String handleRegister(HttpServletRequest request, HttpServletResponse response) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String username = request.getParameter("username");
+        String fullName = request.getParameter("fullName");
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        if (username == null || username.isEmpty() || fullName == null || fullName.isEmpty()
+                || email == null || email.isEmpty() || password == null || password.isEmpty()) {
+            request.setAttribute("userName", username);
+            request.setAttribute("fullName", fullName);
+            request.setAttribute("email", email);
+            request.setAttribute("error", "Please fill all fields of register form!!!!");
+            return "register.jsp";
+        }
+        try {
+            String code = UUID.randomUUID().toString();
+            password = PasswordUtils.encryptSHA256(password);
+            if (uDAO.isEmailExist(email)) {
+                request.setAttribute("userName", username);
+                request.setAttribute("fullName", fullName);
+                request.setAttribute("email", email);
+                request.setAttribute("error", "Email is already registered!");
+            } else {
+                UserDTO newUser = new UserDTO(username, password, fullName, email, "member", false, code);
+                boolean result = uDAO.insertUser(newUser);
+                if (result) {
+                    System.out.println("Sending verification email to: " + email);
+                    EmailUtils.sendVerificationEmail(email, fullName, code);
+                    System.out.println("Email sent successfully!");
+                    request.setAttribute("success", "Registration successful! Please check your email to verify your account.");
+                } else {
+                    request.setAttribute("userName", username);
+                    request.setAttribute("fullName", fullName);
+                    request.setAttribute("email", email);
+                    request.setAttribute("error", "Registration failed!");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Error sending email: " + e.getMessage());
+        }
+        return "register.jsp";
     }
 
     private String handleViewProfile(HttpServletRequest request, HttpServletResponse response) {
@@ -152,7 +195,7 @@ public class UserController extends HttpServlet {
         UserDTO user = GeneralMethod.getCurrentUser(request);
         List<BorrowDTO> list = brdao.getBorrowsByUser(user.getUserID());
         request.setAttribute("myBorrows", list);
-        
+
         request.setAttribute("activeTab", tab);
         request.setAttribute("user", user);
         return "profile.jsp";
@@ -192,4 +235,9 @@ public class UserController extends HttpServlet {
         return url;
     }
 
+    private String handleHome(HttpServletRequest request, HttpServletResponse response) {
+        UserDTO user = GeneralMethod.getCurrentUser(request);
+        GeneralMethod.prepareDashboard(request,user.getRole());
+        return WELCOME;
+    }
 }

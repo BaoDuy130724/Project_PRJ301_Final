@@ -9,11 +9,18 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
+import model.BookDAO;
+import model.BookDTO;
 import model.BorrowDAO;
 import model.BorrowDTO;
+import model.BorrowDetailDTO;
 import model.UserDTO;
+import org.apache.jasper.tagplugins.jstl.core.ForEach;
 import utils.*;
 
 /**
@@ -34,6 +41,7 @@ public class BorrowController extends HttpServlet {
      */
     private static final String WELCOME = "welcome.jsp";
     BorrowDAO brdao = new BorrowDAO();
+    BookDAO bdao = new BookDAO();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -47,6 +55,12 @@ public class BorrowController extends HttpServlet {
                 url = handleDetailViewing(request, response);
             } else if (action.equals("searchMyBorrows")) {
                 url = handleBorrowSearching(request, response);
+            } else if (action.equals("addToCart")) {
+                url = handleAddToCart(request, response);
+            } else if (action.equals("confirmBorrow")) {
+                url = handleBorrowComfirmation(request, response);
+            } else if (action.equals("removeFromCart")) {
+                url = handleBorrowRemoving(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -119,22 +133,119 @@ public class BorrowController extends HttpServlet {
 
         int id = Integer.parseInt(request.getParameter("borrowId"));
         request.setAttribute("details", brdao.getBorrowDetails(id));
-
         return "borrowDetailPartial.jsp";
     }
 
     private String handleBorrowSearching(HttpServletRequest request, HttpServletResponse response) {
-        
+
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
         UserDTO user = GeneralMethod.getCurrentUser(request);
         List<BorrowDTO> result = brdao.searchBorrowsByUserAndDate(user.getUserID(), fromDate, toDate);
-        
+
         request.setAttribute("myBorrows", result);
         request.setAttribute("fromDate", fromDate);
-        request.setAttribute("toDate", toDate); 
+        request.setAttribute("toDate", toDate);
         request.setAttribute("activeTab", "borrows");
         return "profile.jsp";
     }
 
+    private String handleAddToCart(HttpServletRequest request, HttpServletResponse response) {
+        if (!GeneralMethod.isMember(request)) {
+            GeneralMethod.getAccessDenied(request, "You do not have permission to do this feature");
+            return WELCOME;
+        }
+        try {
+            HttpSession s = request.getSession();
+            List<BorrowDetailDTO> cart = (List<BorrowDetailDTO>) s.getAttribute("borrowCart");
+            if (cart == null) {
+                cart = new ArrayList<>();
+                s.setAttribute("borrowCart", cart);
+            }
+            String bookId = request.getParameter("bookId");
+            if (bookId == null) {
+                request.setAttribute("error", "Do not have this book");
+                return WELCOME;
+            }
+            int bookId_value = Integer.parseInt(bookId);
+            BookDTO book = bdao.getBookById(bookId_value);
+            if (book == null || book.getAvailable() == 0) {
+                request.setAttribute("error", "Book is not available");
+                return WELCOME;
+            }
+            boolean found = false;
+            for (BorrowDetailDTO item : cart) {
+                if (item.getBookId() == bookId_value) {
+                    item.setQuantity(item.getQuantity() + 1);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                cart.add(new BorrowDetailDTO(0, bookId_value, book.getTitle(), 1));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        GeneralMethod.pushListBook(request, "member");
+        return WELCOME;
+    }
+
+    private String handleBorrowComfirmation(HttpServletRequest request, HttpServletResponse response) {
+        if (!GeneralMethod.isMember(request)) {
+            GeneralMethod.getAccessDenied(request, "You do not have permission to do this feature");
+            return WELCOME;
+        }
+        try {
+            HttpSession s = request.getSession(false);
+            UserDTO user = (UserDTO) s.getAttribute("user");
+            List<BorrowDetailDTO> cart = (List<BorrowDetailDTO>) s.getAttribute("borrowCart");
+            if (user != null && cart != null && !cart.isEmpty()) {
+                Date currentDate = new Date(System.currentTimeMillis());
+                BorrowDTO borrow = new BorrowDTO(0, user.getUserID(), "", currentDate, null, "Borrowing");
+                int borrowID = brdao.createBorrow(borrow);
+                for (BorrowDetailDTO item : cart) {
+                    item.setBorrowId(borrowID);
+                    brdao.addBorrowDetail(item);
+                    bdao.updateBookAvailable(item.getBookId(), -item.getQuantity());
+                }
+                s.removeAttribute("borrowCart");
+                request.setAttribute("message", "Borrowing successful!");
+            } else {
+                request.setAttribute("error", "Your cart is empty.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        GeneralMethod.pushListBook(request, "member");
+        return WELCOME;
+    }
+
+    private String handleBorrowRemoving(HttpServletRequest request, HttpServletResponse response) {
+        if (!GeneralMethod.isMember(request)) {
+            GeneralMethod.getAccessDenied(request, "You do not have permission to do this feature");
+            return WELCOME;
+        }
+        try {
+            String showCart =  request.getParameter("showCart");
+            if("true".equals(showCart)){
+                request.setAttribute("showCartPopup", true);
+            }
+            HttpSession s = request.getSession(false);
+            String index = request.getParameter("index");
+            if (index == null || index.isEmpty()) {
+                request.setAttribute("error", "do not exist");
+                return WELCOME;
+            }
+            int index_value = Integer.parseInt(index);
+            List<BorrowDetailDTO> cart = (List<BorrowDetailDTO>) s.getAttribute("borrowCart");
+            if (cart != null && index_value >= 0 && index_value < cart.size()) {
+                cart.remove(index_value);
+            }
+        } catch (Exception e) {
+        }
+        GeneralMethod.pushListBook(request, "member");
+        return WELCOME;
+    }
 }

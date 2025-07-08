@@ -97,6 +97,7 @@ public class MainController extends HttpServlet {
         List<String> listUserAction = new ArrayList<>();
         listUserAction.add("login");
         listUserAction.add("register");
+        listUserAction.add("home");
         listUserAction.add("logout");
         listUserAction.add("viewProfile");
         listUserAction.add("updateProfile");
@@ -123,6 +124,9 @@ public class MainController extends HttpServlet {
         listBorrowAction.add("viewAllBorrows");
         listBorrowAction.add("viewBorrowDetailAjax");
         listBorrowAction.add("searchMyBorrows");
+        listBorrowAction.add("addToCart");
+        listBorrowAction.add("confirmBorrow");
+        listBorrowAction.add("removeFromCart");
         if (listBorrowAction.contains(action)) {
             return true;
         }

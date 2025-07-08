@@ -29,6 +29,7 @@ public class BorrowDTO {
         this.returnDate = returnDate;
         this.status = status;
     }
+    
 
     public int getBorrowId() {
         return borrowId;

@@ -16,11 +16,13 @@ public class UserDTO {
     private String email;
     private String role;
     private boolean status;
+    private String verifyCode;
     public UserDTO (){
         
     }
 
-    public UserDTO(int userID, String userName, String password, String fullName, String email, String role, boolean status) {
+    public UserDTO(int userID, String userName, String password, 
+            String fullName, String email, String role, boolean status) {
         this.userID = userID;
         this.userName = userName;
         this.password = password;
@@ -30,12 +32,32 @@ public class UserDTO {
         this.status = status;
     }
 
+    public UserDTO(String userName, String password, 
+            String fullName, String email, String role, boolean status, String verifyCode) {
+        this.userName = userName;
+        this.password = password;
+        this.fullName = fullName;
+        this.email = email;
+        this.role = role;
+        this.status = status;
+        this.verifyCode = verifyCode;
+    }
+    
+
     public int getUserID() {
         return userID;
     }
 
     public String getUserName() {
         return userName;
+    }
+
+    public void setVerifyCode(String verifyCode) {
+        this.verifyCode = verifyCode;
+    }
+
+    public String getVerifyCode() {
+        return verifyCode;
     }
 
     public String getPassword() {

@@ -21,9 +21,11 @@ public class UserDAO {
     PreparedStatement pst = null;
     ResultSet rs = null;
     private static final String GetUser = "SELECT * FROM Users ";
+    private static final String InsertUser = "INSERT INTO Users (Username, PasswordHash, FullName, Email, Role, Status, verifyCode) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     public boolean checkLogin(String username, String password) {
-        String sql = GetUser + "WHERE Username = ? AND PasswordHash = ?";
+        String sql = GetUser + "WHERE Username = ? AND PasswordHash = ? AND Status = 1";
         try {
             con = utils.DBUtils.getConnection();
             pst = con.prepareStatement(sql);
@@ -111,6 +113,52 @@ public class UserDAO {
             pst.setString(1, user.getFullName());
             pst.setString(2, user.getEmail());
             pst.setString(3, user.getUserName());
+            return pst.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean insertUser(UserDTO user) {
+        String sql = InsertUser;
+        try {
+            con = utils.DBUtils.getConnection();
+            pst = con.prepareStatement(sql);
+            pst.setString(1, user.getUserName());
+            pst.setString(2, user.getPassword()); // cần phải hash password trước khi lưu xuống db
+            pst.setString(3, user.getFullName());
+            pst.setString(4, user.getEmail());
+            pst.setString(5, user.getRole());
+            pst.setBoolean(6, user.isStatus()); // chưa xác thực
+            pst.setString(7, user.getVerifyCode());
+            return pst.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isEmailExist(String email) {
+        String sql = GetUser + "WHERE Email = ?";
+        try {
+            con = utils.DBUtils.getConnection();
+            pst = con.prepareStatement(sql);
+            pst.setString(1, email);
+            rs = pst.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean verifyAccountByCode(String code) {
+        String sql = "UPDATE Users SET Status = 1, verifyCode = NULL WHERE verifyCode = ?";
+        try {
+            con = utils.DBUtils.getConnection();  
+            pst = con.prepareStatement(sql);
+            pst.setString(1, code);
             return pst.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
