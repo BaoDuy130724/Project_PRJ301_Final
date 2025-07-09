@@ -6,13 +6,10 @@
         <meta charset="UTF-8">
         <title>Login - Library System</title>
 
-        <!-- Bootstrap 5 -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        <!-- Bootstrap Icons (Optional) -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-        <!-- Custom CSS -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/login.css">
     </head>
     <body class="bg-light d-flex align-items-center justify-content-center vh-100">

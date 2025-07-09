@@ -9,13 +9,17 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import model.BookDAO;
 import model.BookDTO;
-import model.CategoryDAO;
-import model.CategoryDTO;
+import model.UserDTO;
 import utils.GeneralMethod;
 
 /**
@@ -143,7 +147,15 @@ public class BookController extends HttpServlet {
             int quantity = Integer.parseInt(request.getParameter("quantity"));
             int available = Integer.parseInt(request.getParameter("available"));
             int categoryId = Integer.parseInt(request.getParameter("categoryId"));
-            BookDTO book = new BookDTO(title, author, publisher, yearPublished, ISBN, categoryId, quantity, available, false);
+
+            BookDTO book = new BookDTO(title, author, publisher, yearPublished, ISBN, categoryId, quantity, available, false, null);
+
+            if (!isAdd) {
+                int bookId = Integer.parseInt(request.getParameter("bookId"));
+                book.setBookId(bookId);
+                BookDTO oldBook = bdao.getBookById(bookId); 
+                book.setImage(oldBook.getImage());
+            }
             if (errorMessage != null) {
                 request.setAttribute("message", errorMessage);
                 request.setAttribute("book", book);
@@ -151,24 +163,50 @@ public class BookController extends HttpServlet {
                 GeneralMethod.pushListCategory(request);
                 return url;
             }
+
+            Part imagePart = request.getPart("image");
+            String fileName = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
+            String imageFileName = null;
+
             boolean success;
             if (isAdd) {
                 success = bdao.createBook(book);
+                System.out.println("Book creation success? " + success);
+                if (success) {
+                    int bookId = bdao.getLastInsertedBookId(); // Lấy ID để đặt tên file ảnh
+                    book.setBookId(bookId);
+                    if (fileName != null && !fileName.isEmpty()) {
+                        imageFileName = bookId + ".jpg";
+                        saveUploadedImage(imagePart, imageFileName, request);
+                        bdao.updateBookImage(bookId, imageFileName);
+                    }
+                }
                 request.setAttribute("message", success ? "Book added successfully." : "Failed to add book.");
             } else {
-                int bookId = Integer.parseInt(request.getParameter("bookId"));
-                book.setBookId(bookId);
                 success = bdao.updateBook(book);
+                if (fileName != null && !fileName.isEmpty()) {
+                    imageFileName = book.getBookId() + ".jpg";
+                    saveUploadedImage(imagePart, imageFileName, request);
+                    bdao.updateBookImage(book.getBookId(), imageFileName);
+                }
                 request.setAttribute("message", success ? "Book updated successfully." : "Failed to update book.");
             }
+
             if (!success) {
                 request.setAttribute("book", book);
+                GeneralMethod.pushListCategory(request);
+                return "productForm.jsp";
             }
+
         } catch (Exception e) {
             e.printStackTrace();
+            request.setAttribute("message", "An error occurred while processing the book.");
+            url = "productForm.jsp"; // BẮT BUỘC set lại URL rõ ràng nếu có lỗi
         }
+
         request.setAttribute("isAdd", isAdd);
-        GeneralMethod.prepareDashboard(request, GeneralMethod.getCurrentUser(request).getRole());
+        UserDTO user = GeneralMethod.getCurrentUser(request);
+        GeneralMethod.prepareDashboard(request, user.getRole());
         return url;
     }
 
@@ -234,5 +272,30 @@ public class BookController extends HttpServlet {
             e.printStackTrace();
         }
         return handleBookAdding(request, response);
+    }
+
+    private void saveUploadedImage(Part imagePart, String imageFileName, HttpServletRequest request) {
+        try {
+            String savePath = request.getServletContext().getRealPath("/assets/book_images");
+
+            File fileSaveDir = new File(savePath);
+            if (!fileSaveDir.exists()) {
+                fileSaveDir.mkdirs();
+            }
+            String fullSavePath = savePath + File.separator + imageFileName;
+
+            try ( InputStream is = imagePart.getInputStream();  FileOutputStream fos = new FileOutputStream(fullSavePath)) {
+
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = is.read(buffer)) != -1) {
+                    fos.write(buffer, 0, bytesRead);
+                }
+            }
+            System.out.println("Image saved to: " + fullSavePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error saving image: " + e.getMessage());
+        }
     }
 }

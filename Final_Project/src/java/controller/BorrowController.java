@@ -61,6 +61,8 @@ public class BorrowController extends HttpServlet {
                 url = handleBorrowComfirmation(request, response);
             } else if (action.equals("removeFromCart")) {
                 url = handleBorrowRemoving(request, response);
+            } else if (action.equals("markReturned")) {
+                url = handleMarkReturned(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -228,8 +230,8 @@ public class BorrowController extends HttpServlet {
             return WELCOME;
         }
         try {
-            String showCart =  request.getParameter("showCart");
-            if("true".equals(showCart)){
+            String showCart = request.getParameter("showCart");
+            if ("true".equals(showCart)) {
                 request.setAttribute("showCartPopup", true);
             }
             HttpSession s = request.getSession(false);
@@ -247,5 +249,26 @@ public class BorrowController extends HttpServlet {
         }
         GeneralMethod.pushListBook(request, "member");
         return WELCOME;
+    }
+
+    private String handleMarkReturned(HttpServletRequest request, HttpServletResponse response) {
+        if (!GeneralMethod.isAdmin(request)) {
+            GeneralMethod.getAccessDenied(request, "You do not have permission to access this page");
+            return WELCOME;
+        }
+        try {
+            int borrowId = Integer.parseInt(request.getParameter("borrowId"));
+            Date returnDate = new Date(System.currentTimeMillis());
+            boolean success = brdao.markReturned(borrowId, returnDate);
+            if (success) {
+                request.setAttribute("message", "Marked borrow ID " + borrowId + " as returned.");
+            } else {
+                request.setAttribute("message", "Failed to mark as returned.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        GeneralMethod.pushListBorrow(request);
+        return "borrowList.jsp";
     }
 }

@@ -14,7 +14,7 @@
     <c:when test="${sessionScope.user != null && sessionScope.user.role eq 'admin'}">
         <div class="container mt-5">
             <h1 class="mb-4 text-center">${isAdd ? "ADD BOOK" : "EDIT BOOK"}</h1>
-            <form action="MainController" method="post" class="needs-validation" novalidate>
+            <form action="MainController" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                 <input type="hidden" name="action" value="bookSubmitting"/>
                 <input type="hidden" name="bookId" value="${book != null ? book.bookId : 0}"/>
                 <input type="hidden" name="isAdd" value="${isAdd}"/>
@@ -87,11 +87,21 @@
                     <div class="form-text">Automatically updated on borrow/return.</div>
                 </div>
 
+                <div class="mb-3">
+                    <label for="image" class="form-label">Image</label>
+                    <input type="file" name="image" class="form-control" />
+                </div>
+
                 <button type="submit" class="btn btn-primary mt-3">${isAdd?"Create":"Update"}</button>
             </form>
             <c:if test="${not empty message}">
                 <div class="alert alert-info mt-3" role="alert">
                     ${message}
+                </div>
+            </c:if>
+            <c:if test="${not empty accessDenied}">
+                <div class="alert alert-info mt-3" role="alert">
+                    ${accessDenied}
                 </div>
             </c:if>
         </div>

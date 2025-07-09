@@ -19,12 +19,13 @@ public class BookDTO {
     private int quantity;
     private int available;
     private boolean isdeleted;
+    private String image;
     public BookDTO(){
         
     }
 
     public BookDTO(int bookId, String title, String author, String publisher, 
-            int year, String ISBN, int categoryId, int quantity, int available, boolean isdeleted) {
+            int year, String ISBN, int categoryId, int quantity, int available, boolean isdeleted, String image) {
         this.bookId = bookId;
         this.title = title;
         this.author = author;
@@ -35,10 +36,11 @@ public class BookDTO {
         this.quantity = quantity;
         this.available = available;
         this.isdeleted = isdeleted;
+        this.image = image;
     }
 
     public BookDTO(String title, String author, String publisher, 
-            int yearPublished, String ISBN, int categoryId, int quantity, int available, boolean isdeleted) {
+            int yearPublished, String ISBN, int categoryId, int quantity, int available, boolean isdeleted, String image) {
         this.title = title;
         this.author = author;
         this.publisher = publisher;
@@ -48,6 +50,15 @@ public class BookDTO {
         this.quantity = quantity;
         this.available = available;
         this.isdeleted = isdeleted;
+        this.image = image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getImage() {
+        return image;
     }
 
     public int getBookId() {

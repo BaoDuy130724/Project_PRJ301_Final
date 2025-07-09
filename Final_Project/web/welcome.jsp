@@ -1,8 +1,3 @@
-<%--
-    Document   : welcome
-    Created on : (Assuming this is your main landing page after login or for viewing books)
-    Author     : Admin
---%>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -53,6 +48,7 @@
                                 <c:if test="${sessionScope.user.role eq 'admin'}">
                                     <th>Book ID</th>
                                     </c:if>
+                                <th>Image</th>
                                 <th>Title</th>
                                 <th>Author</th>
                                 <th>Publisher</th>
@@ -73,6 +69,12 @@
                                     <c:if test="${sessionScope.user.role eq 'admin'}">
                                         <td>${book.bookId}</td>
                                     </c:if>
+                                    <td>
+                                        <img src="${pageContext.request.contextPath}/assets/book_images/${book.image != null ? book.image : 'default.jpg'}"
+                                             alt="${book.title}"
+                                             class="img-thumbnail"
+                                             style="width: 60px; height: auto;" />
+                                    </td>
                                     <td>${book.title}</td>
                                     <td>${book.author}</td>
                                     <td>${book.publisher}</td>

@@ -5,6 +5,7 @@
 package controller;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +18,12 @@ import java.util.List;
  *
  * @author Admin
  */
-@WebServlet(name = "MainController", urlPatterns = {"","/","/MainController"})
+@WebServlet(name = "MainController", urlPatterns = {"/MainController"})
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 1,   
+    maxFileSize = 1024 * 1024 * 10,      
+    maxRequestSize = 1024 * 1024 * 15      
+)
 public class MainController extends HttpServlet {
 
     /**
@@ -127,6 +133,7 @@ public class MainController extends HttpServlet {
         listBorrowAction.add("addToCart");
         listBorrowAction.add("confirmBorrow");
         listBorrowAction.add("removeFromCart");
+        listBorrowAction.add("markReturned");
         if (listBorrowAction.contains(action)) {
             return true;
         }
