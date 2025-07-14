@@ -5,11 +5,14 @@
         <group>
             <file>file:/E:/FPT/SU2025/Final_PRJ/Final_Project/src/java/model/BookDAO.java</file>
             <file>file:/E:/FPT/SU2025/Final_PRJ/Final_Project/src/java/controller/BookController.java</file>
+            <file>file:/E:/FPT/SU2025/Final_PRJ/Final_Project/src/java/model/UserDAO.java</file>
             <file>file:/E:/FPT/SU2025/Final_PRJ/Final_Project/src/java/controller/MainController.java</file>
             <file>file:/E:/FPT/SU2025/Final_PRJ/Final_Project/src/java/utils/GeneralMethod.java</file>
             <file>file:/E:/FPT/SU2025/Final_PRJ/Final_Project/web/welcome.jsp</file>
+            <file>file:/E:/FPT/SU2025/Final_PRJ/Final_Project/src/java/controller/UserController.java</file>
             <file>file:/E:/FPT/SU2025/Final_PRJ/Final_Project/web/productForm.jsp</file>
             <file>file:/E:/FPT/SU2025/Final_PRJ/Final_Project/src/java/model/BookDTO.java</file>
+            <file>file:/E:/FPT/SU2025/Final_PRJ/Final_Project/src/java/controller/VerifyAccountServlet.java</file>
         </group>
     </open-files>
 </project-private>
