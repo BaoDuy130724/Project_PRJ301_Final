@@ -57,7 +57,7 @@ public class BookDAO {
 
     public List<BookDTO> getActiveBooks() {
         List<BookDTO> books = new ArrayList<>();
-        String sql = GetBook + "WHERE Available > 0 AND IsDeleted = 0";
+        String sql = GetBook + "WHERE IsDeleted = 0";
         try {
             con = DBUtils.getConnection();
             Statement stmt = con.createStatement();
