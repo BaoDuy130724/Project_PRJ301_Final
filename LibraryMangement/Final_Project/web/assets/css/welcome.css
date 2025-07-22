@@ -1,0 +1,118 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Jul 8, 2025, 4:15:15 PM
+    Author     : Admin
+*/
+/* Nền tổng thể */
+body {
+    background: linear-gradient(to right, #eef5ff, #ffffff);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #212529;
+    line-height: 1.6;
+}
+
+/* Tiêu đề chính */
+h2 {
+    font-weight: 600;
+    color: #0d6efd;
+    margin-bottom: 1rem;
+}
+
+/* Bảng sách */
+.table {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.05);
+}
+
+.table th {
+    background-color: #0d6efd;
+    color: white;
+    vertical-align: middle;
+}
+
+.table td {
+    vertical-align: middle;
+    background-color: #fff;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f7ff;
+    transition: background-color 0.2s;
+}
+
+/* Badge trạng thái */
+.badge {
+    font-size: 0.85rem;
+    padding: 0.4em 0.6em;
+    border-radius: 0.5rem;
+}
+
+/* Tìm kiếm */
+.input-group input[type="text"] {
+    border-radius: 0.5rem 0 0 0.5rem;
+    box-shadow: none;
+    border-color: #ced4da;
+}
+
+.input-group .btn {
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* Nút */
+.btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Nút nhỏ */
+.btn-sm {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.6rem;
+}
+
+/* Modal giỏ mượn */
+.modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-header, .modal-footer {
+    border: none;
+    background-color: #f8f9fa;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: #0d6efd;
+}
+
+/* Alert */
+.alert {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
