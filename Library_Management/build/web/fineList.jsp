@@ -14,8 +14,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Fine List</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     </head>
     <body>
         <div class="container mt-5">
@@ -46,6 +46,13 @@
                         <option value="Waived" ${param.status == 'Waived' ? 'selected' : ''}>Waived</option>
                     </select>
                 </div>
+                <c:if test="${sessionScope.user.role eq 'admin'}">
+                    <div class="col-md-3">
+                        <label class="form-label">Borrower Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter borrower name"
+                               value="${param.name != null ? param.name : ''}" />
+                    </div>
+                </c:if>
 
                 <div class="col-md-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">Search</button>
@@ -70,10 +77,10 @@
                                 <th>Status</th>
                                 <th>Status Description</th>
                                 <th>Created At</th>
-                                <c:if test="${sessionScope.user.role eq 'admin'}">
+                                    <c:if test="${sessionScope.user.role eq 'admin'}">
                                     <th>Name</th>
                                     <th class="text-center">Action</th>
-                                </c:if>
+                                    </c:if>
                             </tr>
                         </thead>
                         <tbody>
