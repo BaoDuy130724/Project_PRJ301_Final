@@ -20,9 +20,9 @@ import java.util.List;
  */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 1,   
-    maxFileSize = 1024 * 1024 * 10,      
-    maxRequestSize = 1024 * 1024 * 15      
+        fileSizeThreshold = 1024 * 1024 * 1,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 15
 )
 public class MainController extends HttpServlet {
 
@@ -50,9 +50,9 @@ public class MainController extends HttpServlet {
                     url = "BookController";
                 } else if (isBorrowAction(action)) {
                     url = "BorrowController";
-                }else if (isReservationAction(action)) {
+                } else if (isReservationAction(action)) {
                     url = "ReservationController";
-                }else if (isFineAction(action)) {    
+                } else if (isFineAction(action)) {
                     url = "FineController";
                 }
             }
@@ -124,12 +124,13 @@ public class MainController extends HttpServlet {
         listBookAction.add("bookSubmitting");
         listBookAction.add("editBook");
         listBookAction.add("deleteBook");
-        listBookAction.add("preOrder"); 
+        listBookAction.add("preOrder");
         if (listBookAction.contains(action)) {
             return true;
         }
         return false;
     }
+
     private boolean isBorrowAction(String action) {
         List<String> listBorrowAction = new ArrayList<>();
         listBorrowAction.add("viewAllBorrows");
@@ -146,15 +147,15 @@ public class MainController extends HttpServlet {
         }
         return false;
     }
-    
+
     private boolean isReservationAction(String action) {
         List<String> list = new ArrayList<>();
-        list.add("viewReservations");     
-        list.add("addToReservationCart"); 
-        list.add("viewReservationCart"); 
-        list.add("removeFromReservationCart"); 
-        list.add("clearReservationCart"); 
-        list.add("confirmReservation");  
+        list.add("viewReservations");
+        list.add("addToReservationCart");
+        list.add("viewReservationCart");
+        list.add("removeFromReservationCart");
+        list.add("clearReservationCart");
+        list.add("confirmReservation");
         list.add("updateQuantity");
         list.add("viewReservationHistory");
         list.add("viewReservationDetail");
@@ -164,14 +165,15 @@ public class MainController extends HttpServlet {
         list.add("searchReservationsForAdmin");
         return list.contains(action);
     }
-private boolean isFineAction(String action) {
-    List<String> listFineAction = new ArrayList<>();
-    listFineAction.add("listFine");
-    listFineAction.add("createForm");
-    listFineAction.add("createFine");
-    listFineAction.add("updateStatus");
-    return listFineAction.contains(action);
-}
 
+    private boolean isFineAction(String action) {
+        List<String> listFineAction = new ArrayList<>();
+        listFineAction.add("listFine");
+        listFineAction.add("createForm");
+        listFineAction.add("createFine");
+        listFineAction.add("updateStatus");
+        listFineAction.add("searchFine");
+        return listFineAction.contains(action);
+    }
 
 }

@@ -125,7 +125,7 @@
                                         <c:choose>
                                             <c:when test="${sessionScope.user.role eq 'admin'}">
                                                 <div class="d-flex flex-column gap-2">
-                                                    <a href="MainController?action=editBook&bookId=${book.bookId}" class="btn btn-sm btn-outline-primary">
+                                                    <a href="MainController?action=editBook&bookId=${book.bookId}&isAdd=false" class="btn btn-sm btn-outline-primary">
                                                         <i class="bi bi-pencil-square"></i> Edit
                                                     </a>
                                                     <a href="MainController?action=deleteBook&bookId=${book.bookId}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this book? This action cannot be undone.')">
