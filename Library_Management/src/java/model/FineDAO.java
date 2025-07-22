@@ -204,20 +204,20 @@ public class FineDAO {
                 + "JOIN FineReasons fr ON f.Reason = fr.ReasonCode "
                 + "JOIN Borrows b ON f.BorrowID = b.BorrowID "
                 + "WHERE b.UserID = ? "
-                + "AND (f.Reason LIKE ? OR ? = '') "
-                + "AND (f.StatusCode LIKE ? OR ? = '')";
+                + "AND (? = '' OR f.Reason LIKE ?) "
+                + "AND (? = '' OR f.StatusCode = ?)";
 
         List<FineDTO> list = new ArrayList<>();
         try ( Connection con = DBUtils.getConnection();  PreparedStatement pst = con.prepareStatement(sql)) {
 
-            String reasonWildcard = "%" + (reason == null ? "" : reason.trim()) + "%";
-            String statusWildcard = "%" + (status == null ? "" : status.trim()) + "%";
+            String reasonVal = reason == null ? "" : reason.trim();
+            String statusVal = status == null ? "" : status.trim();
 
             pst.setInt(1, userId);
-            pst.setString(2, reasonWildcard);
-            pst.setString(3, reason == null ? "" : reason.trim());
-            pst.setString(4, statusWildcard);
-            pst.setString(5, status == null ? "" : status.trim());
+            pst.setString(2, reasonVal);
+            pst.setString(3, "%" + reasonVal + "%");
+            pst.setString(4, statusVal);
+            pst.setString(5, statusVal);
 
             try ( ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
@@ -238,5 +238,4 @@ public class FineDAO {
         }
         return list;
     }
-
 }
