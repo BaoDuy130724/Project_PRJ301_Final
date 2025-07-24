@@ -70,10 +70,9 @@ public class BorrowController extends HttpServlet {
             }//phong them
             else if (action.equals("markLostForm")) {
                 url = handleMarkLostForm(request, response);
-            }else if (action.equals("confirmMarkLost")) {
+            } else if (action.equals("confirmMarkLost")) {
                 url = handleConfirmMarkLost(request, response);
             }
-
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -219,8 +218,8 @@ public class BorrowController extends HttpServlet {
                 //sua them ngay du kien
                 java.time.LocalDate borrowLocalDate = currentDate.toLocalDate();
                 java.sql.Date expectedReturnDate = java.sql.Date.valueOf(borrowLocalDate.plusDays(7));
-                
-                BorrowDTO borrow = new BorrowDTO(0, user.getUserID(), "", currentDate,expectedReturnDate, null, "Borrowing");
+
+                BorrowDTO borrow = new BorrowDTO(0, user.getUserID(), "", currentDate, expectedReturnDate, null, "Borrowing");
                 int borrowID = brdao.createBorrow(borrow);
                 for (BorrowDetailDTO item : cart) {
                     item.setBorrowId(borrowID);
@@ -272,59 +271,60 @@ public class BorrowController extends HttpServlet {
             return WELCOME;
         }
         try {
-           
+
             int borrowId = Integer.parseInt(request.getParameter("borrowId"));
             Date returnDate = new Date(System.currentTimeMillis());
             boolean success = brdao.markReturned(borrowId, returnDate);
             if (success) {
                 List<BorrowDetailDTO> detailList = brdao.getBorrowDetails(borrowId);
-                for(BorrowDetailDTO detail : detailList){
+                for (BorrowDetailDTO detail : detailList) {
                     int bookid = detail.getBookId();
                     int quantity = detail.getQuantity();
                     boolean updated = bdao.increaseAvailable(bookid, quantity);
-                    if(!updated){
+                    if (!updated) {
                         System.out.println("Failed to update availability for book ID: " + bookid);
                     }
                 }
-            // phong them
-            BorrowDTO borrow = brdao.getBorrowById(borrowId);
-            if (borrow != null) {
-                LocalDate expected = borrow.getExpectedReturnDate().toLocalDate();
-                LocalDate actual = returnDate.toLocalDate();
-                long daysLate = ChronoUnit.DAYS.between(expected, actual);
+                // phong them
+                BorrowDTO borrow = brdao.getBorrowById(borrowId);
+                if (borrow != null) {
+                    LocalDate expected = borrow.getExpectedReturnDate().toLocalDate();
+                    LocalDate actual = returnDate.toLocalDate();
+                    long daysLate = ChronoUnit.DAYS.between(expected, actual);
 
-                if (daysLate > 0) {
-                    double fineAmount = daysLate * 5000;
+                    if (daysLate > 0) {
+                        double fineAmount = daysLate * 5000;
 
-                    FineDTO fine = new FineDTO();
-                    fine.setBorrowID(borrowId);
-                    fine.setAmount(fineAmount);
-                    fine.setReason("OVERDUE"); 
-                    fine.setStatusCode("Unpaid");
-                    fine.setCreatedAt(returnDate);
+                        FineDTO fine = new FineDTO();
+                        fine.setBorrowID(borrowId);
+                        fine.setAmount(fineAmount);
+                        fine.setReason("OVERDUE");
+                        fine.setStatusCode("Unpaid");
+                        fine.setCreatedAt(returnDate);
 
-                    FineDAO fineDAO = new FineDAO();
-                    boolean fineInserted = fineDAO.insertFine(fine);
-                    if (fineInserted) {
-                        request.setAttribute("message", "Marked borrow ID " + borrowId + " as returned (Late: " + daysLate + " days, fine: " + fineAmount + " VND).");
+                        FineDAO fineDAO = new FineDAO();
+                        boolean fineInserted = fineDAO.insertFine(fine);
+                        if (fineInserted) {
+                            request.setAttribute("message", "Marked borrow ID " + borrowId + " as returned (Late: " + daysLate + " days, fine: " + fineAmount + " VND).");
+                        } else {
+                            request.setAttribute("message", "Returned, but failed to insert fine.");
+                        }
                     } else {
-                        request.setAttribute("message", "Returned, but failed to insert fine.");
+                        request.setAttribute("message", "Marked borrow ID " + borrowId + " as returned.");
                     }
                 } else {
-                    request.setAttribute("message", "Marked borrow ID " + borrowId + " as returned.");
+                    request.setAttribute("message", "Returned, but borrow data not found.");
                 }
             } else {
-                request.setAttribute("message", "Returned, but borrow data not found.");
+                request.setAttribute("message", "Failed to mark as returned.");
             }
-        } else {
-            request.setAttribute("message", "Failed to mark as returned.");
-        }
         } catch (Exception e) {
             e.printStackTrace();
         }
         GeneralMethod.pushListBorrow(request);
         return "borrowList.jsp";
     }
+
     //phong them
     private String handleMarkLostForm(HttpServletRequest request, HttpServletResponse response) {
         if (!GeneralMethod.isAdmin(request)) {
@@ -337,6 +337,7 @@ public class BorrowController extends HttpServlet {
         request.setAttribute("borrowId", borrowId);
         return "markLost.jsp";
     }
+
     private String handleConfirmMarkLost(HttpServletRequest request, HttpServletResponse response) {
         if (!GeneralMethod.isAdmin(request)) {
             GeneralMethod.getAccessDenied(request, "You do not have permission to access this page");

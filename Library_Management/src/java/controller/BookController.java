@@ -153,7 +153,7 @@ public class BookController extends HttpServlet {
             if (!isAdd) {
                 int bookId = Integer.parseInt(request.getParameter("bookId"));
                 book.setBookId(bookId);
-                BookDTO oldBook = bdao.getBookById(bookId); 
+                BookDTO oldBook = bdao.getBookById(bookId);  
                 book.setImage(oldBook.getImage());
             }
             if (errorMessage != null) {
